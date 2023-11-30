@@ -59,6 +59,10 @@ namespace Matrixsoft.Framework.DapperExtensions
         /// </summary>
         Task<dynamic> InsertAsync<T>(IDbConnection connection, T entity, IDbTransaction transaction = null, int? commandTimeout = default);
         /// <summary>
+        /// The asynchronous counterpart to <see cref="IDapperImplementor.Update{T}(IDbConnection, IEnumerable{T}, IDbTransaction, int?)"/>.
+        /// </summary>
+        Task UpdateAsync<T>(IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction, int? commandTimeout, bool ignoreAllKeyProperties, IList<IProjection> colsToUpdate = null);
+        /// <summary>
         /// The asynchronous counterpart to <see cref="IDapperImplementor.Update{T}(IDbConnection, T, IDbTransaction, int?)"/>.
         /// </summary>
         Task<bool> UpdateAsync<T>(IDbConnection connection, T entity, IDbTransaction transaction, int? commandTimeout, bool ignoreAllKeyProperties = false, IList<IProjection> colsToUpdate = null);
@@ -112,6 +116,13 @@ namespace Matrixsoft.Framework.DapperExtensions
             var sequenceIdentityColumn = classMap.Properties.Where(p => p.KeyType == KeyType.SequenceIdentity).ToList();
 
             return await InternalInsertAsync(connection, entity, transaction, commandTimeout, classMap, nonIdentityKeyProperties, identityColumn, triggerIdentityColumn, sequenceIdentityColumn);
+        }
+        /// <summary>
+        /// The asynchronous counterpart to <see cref="IDapperImplementor.Update{T}(IDbConnection, IEnumerable{T}, IDbTransaction, int?)"/>.
+        /// </summary>
+        public async Task UpdateAsync<T>(IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction, int? commandTimeout, bool ignoreAllKeyProperties, IList<IProjection> colsToUpdate = null)
+        {
+            await InternalUpdateAsync(connection, entities, transaction, colsToUpdate, commandTimeout, ignoreAllKeyProperties);
         }
         /// <summary>
         /// The asynchronous counterpart to <see cref="IDapperImplementor.Update{T}(IDbConnection, T, IDbTransaction, int?)"/>.
@@ -228,7 +239,7 @@ namespace Matrixsoft.Framework.DapperExtensions
             return await InternalUpdateAsync(connection, entity, classMap, predicate, transaction, cols, commandTimeout, ignoreAllKeyProperties);
         }
 
-        private async void InternalUpdateAsync<T>(IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction, IList<IProjection> cols,
+        private async Task InternalUpdateAsync<T>(IDbConnection connection, IEnumerable<T> entities, IDbTransaction transaction, IList<IProjection> cols,
             int? commandTimeout, bool ignoreAllKeyProperties = false)
         {
             GetMapAndPredicate<T>(entities.FirstOrDefault(), out var classMap, out var predicate, true);

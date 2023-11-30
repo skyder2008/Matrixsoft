@@ -258,6 +258,24 @@ namespace Matrixsoft.Framework.DapperExtensions
         }
 
         /// <summary>
+        /// Executes an update query for the specified entity.
+        /// </summary>
+        public static Task<bool> UpdatePartialAsync<T>(this IDbConnection connection, T entity, IList<IProjection> colsToUpdate, IDbTransaction transaction = null,
+            int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+        {
+            return Instance.UpdateAsync(connection, entity, transaction, commandTimeout, ignoreAllKeyProperties, colsToUpdate);
+        }
+
+        /// <summary>
+        /// Executes an update query for the specified entity.
+        /// </summary>
+        public static Task UpdatePartialAsync<T>(this IDbConnection connection, IEnumerable<T> entities, IList<IProjection> colsToUpdate, IDbTransaction transaction = null,
+            int? commandTimeout = null, bool ignoreAllKeyProperties = false) where T : class
+        {
+            return Instance.UpdateAsync(connection, entities, transaction, commandTimeout, ignoreAllKeyProperties, colsToUpdate);
+        }
+
+        /// <summary>
         /// Executes a delete query for the specified entity.
         /// </summary>
         public static Task<bool> DeleteAsync<T>(this IDbConnection connection, T entity, IDbTransaction transaction = null, int? commandTimeout = null)
